@@ -3,7 +3,7 @@ use std::{env, io::{stdin, stdout, Write}, path::Path, process::Command};
 use clap::{command, Arg, Command as Command2};
 
 fn main() {
-    
+
     let match_result = command!().about("this cli tool lets you edit your Picture in Terminal :)")
     .subcommand(
         Command2::new("blur")
@@ -24,17 +24,20 @@ fn main() {
             .help("allowed parameters -> 90, 180, 270")
         )
     )
-    .arg(
-        Arg::new("path")
-        .short('p')
-        .long("path")
-        .required(true)
-        .help("enter the path")
-    )
+    // .arg(
+    //     Arg::new("path")
+    //     .short('p')
+    //     .long("path")
+    //     .required(true)
+    //     .help("enter the path")
+    // )
     .get_matches();
 
+
+    println!("=> Now Select image (use `ls`, `cd <dir>`, and `select <image>`):");
+    let mut path;
     loop {
-        print!("------> ");
+        print!("--> ");
         stdout().flush();
 
         let mut input = String::new();
@@ -43,7 +46,7 @@ fn main() {
         // print!("{}", command);
         let mut parts = input.trim().split_whitespace();
         let command = parts.next().unwrap();
-        let args = parts;
+        let args = parts.clone();
 
         match command {
             "cd" =>{
@@ -54,7 +57,19 @@ fn main() {
                 }
             },
 
-            "select" => return,
+            "select" => {
+                if let Some(file_name) = parts.next() {
+                    let full_path = env::current_dir().unwrap().join(file_name);
+                    if full_path.exists() && full_path.is_file() {
+                        path = full_path.to_string_lossy().to_string();
+                        break;
+                    } else {
+                        eprintln!("File not found: {}", file_name);
+                    }
+                } else {
+                    eprintln!("Usage: select <filename>");
+                }
+            }
 
             command =>{
                 let child =Command::new(command)
@@ -75,27 +90,25 @@ fn main() {
    
     let editOP =  match_result.subcommand_name().unwrap().to_string();
         // .unwrap_or(&"No edit options given!".to_string());
-    let path =  match_result.get_one::<String>("path");
+    // let path =  match_result.get_one::<String>("path");
         // .unwrap_or(&"path given!".to_string());
     let para =  match_result.subcommand_matches(match_result.subcommand_name().unwrap()).unwrap().get_one::<String>("parameter");
-    // print!("para is {}", para.unwrap() );
-    
 
     edit(editOP, para, path,);
 }
 
-fn edit(editOP : String, para : Option<&String>, path : Option<&String>, ){
+fn edit(editOP : String, para : Option<&String>, path : String, ){
 
     match editOP.as_str() {
         "blur" => {
 
-            print!("editOP is {} and para is {}", editOP, para.unwrap())
+            print!("editOP is {} and para is {} with path {}", editOP, para.unwrap(), path)
 
         }
 
         "rotate" => {
 
-            print!("2editOP is {} and para is {}", editOP, para.unwrap())
+            print!("2editOP is {} and para is {} with path {}", editOP, para.unwrap(), path)
 
 
         }
