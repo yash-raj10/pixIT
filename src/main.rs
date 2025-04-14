@@ -1,6 +1,9 @@
-use std::{env, io::{stdin, stdout, Write}, path::Path, process::Command};
+mod Image_fns;
 
+use std::{env, io::{stdin, stdout, Write}, path::Path, process::Command};
 use clap::{command, Arg, Command as Command2};
+use image::{DynamicImage, ImageReader};
+use Image_fns::{edit_img};
 
 fn main() {
 
@@ -49,6 +52,8 @@ fn main() {
         let args = parts.clone();
 
         match command {
+            // "exit" => {break;}
+
             "cd" =>{
                 let new_dir = args.peekable().peek().map_or("/", |x| *x);
                 let dir = Path::new(new_dir);
@@ -71,6 +76,7 @@ fn main() {
                 }
             }
 
+          
             command =>{
                 let child =Command::new(command)
                     .args(args)
@@ -92,25 +98,35 @@ fn main() {
         // .unwrap_or(&"No edit options given!".to_string());
     // let path =  match_result.get_one::<String>("path");
         // .unwrap_or(&"path given!".to_string());
-    let para =  match_result.subcommand_matches(match_result.subcommand_name().unwrap()).unwrap().get_one::<String>("parameter");
+    let para =  match_result.subcommand_matches(match_result.subcommand_name().unwrap()).unwrap().get_one::<String>("parameter").unwrap().as_str();
 
-    edit(editOP, para, path,);
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    rt.block_on(edit(editOP, para, path.as_str()));
 }
 
-fn edit(editOP : String, para : Option<&String>, path : String, ){
-
+async fn edit(editOP : String, para : &str, path : &str, ){
     match editOP.as_str() {
         "blur" => {
+            // print!("editOP is {} and para is {} with path {}", editOP, para, path)
 
-            print!("editOP is {} and para is {} with path {}", editOP, para.unwrap(), path)
 
         }
 
         "rotate" => {
-
-            print!("2editOP is {} and para is {} with path {}", editOP, para.unwrap(), path)
-
-
+            // print!("2editOP is {} and para is {} with path {}", editOP, para, path)
+            match edit_img(editOP, para, path).await {
+                Ok(img_data) => {
+                    // Generate output path - either overwrite or create new file
+                    let output_path = format!("{}_rotated.jpg", path.trim_end_matches(".jpeg").trim_end_matches(".jpg"));
+                    
+                    // Save the image to disk
+                    std::fs::write(&output_path, img_data).expect("Failed to write image file");
+                    println!("Rotated image saved to: {}", output_path);
+                },
+                Err(e) => {
+                    eprintln!("Error processing image: {}", e);
+                }
+            }
         }
         _ => {
             println!("Unknown operation: {}", editOP);
