@@ -1,9 +1,12 @@
-use clap::{command, Arg, Command};
+use std::{env, io::{stdin, stdout, Write}, path::Path, process::Command};
+
+use clap::{command, Arg, Command as Command2};
 
 fn main() {
+    
     let match_result = command!().about("this cli tool lets you edit your Picture in Terminal :)")
     .subcommand(
-        Command::new("blur")
+        Command2::new("blur")
         .arg(
             Arg::new("parameter")
             .long("para")
@@ -12,7 +15,7 @@ fn main() {
         )
     )
     .subcommand(
-        Command::new("rotate")
+        Command2::new("rotate")
         .arg(
             Arg::new("parameter")
 
@@ -29,6 +32,44 @@ fn main() {
         .help("enter the path")
     )
     .get_matches();
+
+    loop {
+        print!("------> ");
+        stdout().flush();
+
+        let mut input = String::new();
+        stdin().read_line(&mut input).unwrap();
+    
+        // print!("{}", command);
+        let mut parts = input.trim().split_whitespace();
+        let command = parts.next().unwrap();
+        let args = parts;
+
+        match command {
+            "cd" =>{
+                let new_dir = args.peekable().peek().map_or("/", |x| *x);
+                let dir = Path::new(new_dir);
+                if let Err(e) = env::set_current_dir(&dir){
+                    eprintln!("{}", e);
+                }
+            },
+
+            "select" => return,
+
+            command =>{
+                let child =Command::new(command)
+                    .args(args)
+                    .spawn();
+
+                match child {
+                    Ok(mut child) => { child.wait(); },
+                    Err(e) => eprintln!("Failed to execute command: {}", e),
+                }
+
+            }
+        }
+    }
+
 
     // print!("want to edit {}", match_result.get_one::<String>("edit").unwrap_or(&"No edit options given!".to_string()));
    
