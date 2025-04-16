@@ -44,5 +44,71 @@ pub async fn edit_grayscale (para : &str, path : &str) -> Result<Vec<u8>, anyhow
     grayscale_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
 
     Ok(img_buf.into_inner())
-
 }
+
+pub async fn edit_brighten (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+    let img: DynamicImage  = ImageReader::open(path)?.decode()?;
+
+    let mut brighten_image = img.brighten(para.parse::<i32>().unwrap());
+
+    let mut img_buf = Cursor::new(Vec::new());
+    brighten_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
+
+    Ok(img_buf.into_inner())
+}
+
+pub async fn edit_contrast (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+    let img: DynamicImage  = ImageReader::open(path)?.decode()?;
+
+    let mut contrasted_image = img.adjust_contrast(para.parse::<f32>().unwrap());
+
+    let mut img_buf = Cursor::new(Vec::new());
+    contrasted_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
+
+    Ok(img_buf.into_inner())
+}
+
+pub async fn edit_hue_rotation (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+    let img: DynamicImage  = ImageReader::open(path)?.decode()?;
+
+    let mut hue_image = img.huerotate(para.parse::<i32>().unwrap());
+
+    let mut img_buf = Cursor::new(Vec::new());
+    hue_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
+
+    Ok(img_buf.into_inner())
+}
+
+
+// pub async fn edit_resize (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+//     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
+
+//     let mut resized_image = img.resize(para.parse::<i32>().unwrap());
+
+//     let mut img_buf = Cursor::new(Vec::new());
+//     resized_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
+
+//     Ok(img_buf.into_inner())
+// }
+
+
+pub async fn edit_flip (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+    let img: DynamicImage  = ImageReader::open(path)?.decode()?;
+
+    let mut flipped_image: DynamicImage;
+
+    if para == "hor" {
+        flipped_image = img.fliph();
+    } else if para == "ver" {
+        flipped_image = img.flipv()
+        
+    }else {
+        return  Err(anyhow::anyhow!("Invalid Parameter"));
+    }
+
+    let mut img_buf = Cursor::new(Vec::new());
+    flipped_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
+
+    Ok(img_buf.into_inner())
+}
+
