@@ -3,7 +3,7 @@ mod Image_fns;
 use std::{env, io::{stdin, stdout, Write}, path::Path, process::Command};
 use clap::{command, Arg, Command as Command2};
 use image::{DynamicImage, ImageReader};
-use Image_fns::{edit_rotate, edit_blur};
+use Image_fns::{edit_rotate, edit_blur, edit_grayscale};
 
 fn main() {
 
@@ -25,6 +25,16 @@ fn main() {
             .long("para")
             .required(true)
             .help("allowed parameters -> 90, 180, 270")
+        )
+    )
+    .subcommand(
+        Command2::new("grayscale")
+        .arg(
+            Arg::new("parameter")
+
+            .long("para")
+            .required(true)
+            .help("No parameter needed. Hence write 0!")
         )
     )
     // .arg(
@@ -106,6 +116,7 @@ fn main() {
 
 async fn edit(editOP : String, para : &str, path : &str, ){
     match editOP.as_str() {
+
         "blur" => {
             // print!("editOP is {} and para is {} with path {}", editOP, para, path)
             match edit_blur(para, path).await {
@@ -116,6 +127,24 @@ async fn edit(editOP : String, para : &str, path : &str, ){
                     // Save the image to disk
                     std::fs::write(&output_path, img_data).expect("Failed to write image file");
                     println!("Blured image saved to: {}", output_path);
+                },
+                Err(e)=>{
+                    eprintln!("error processing image : {}", e)
+                }
+            }
+        }
+
+        "grayscale" => {
+            // print!("editOP is {} and para is {} with path {}", editOP, para, path)
+            print!("No parameter needed for grayscale!");
+            match edit_grayscale(para, path).await {
+                Ok(img_data) => {
+                    println!("grayscale completed successfully.");
+                    let output_path = format!("{}_grayscaled.jpg", path.trim_end_matches(".jpeg").trim_end_matches(".jpg"));
+                    
+                    // Save the image to disk
+                    std::fs::write(&output_path, img_data).expect("Failed to write image file");
+                    println!("grayscaled image saved to: {}", output_path);
                 },
                 Err(e)=>{
                     eprintln!("error processing image : {}", e)

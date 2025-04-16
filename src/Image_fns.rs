@@ -25,13 +25,23 @@ pub async fn edit_rotate(para : &str, path : &str,) -> Result<Vec<u8>, anyhow::E
 } 
 
 pub async fn edit_blur(para : &str, path : &str,)-> Result<Vec<u8>, anyhow::Error>{
-
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let mut blured_image = img.blur(para.parse::<f32>().unwrap());
 
     let mut img_buf = Cursor::new(Vec::new());
     blured_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
+
+    Ok(img_buf.into_inner())
+}
+
+pub async fn edit_grayscale (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+    let img: DynamicImage  = ImageReader::open(path)?.decode()?;
+
+    let mut grayscale_image = img.grayscale();
+
+    let mut img_buf = Cursor::new(Vec::new());
+    grayscale_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
 
     Ok(img_buf.into_inner())
 
