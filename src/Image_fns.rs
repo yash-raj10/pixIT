@@ -1,4 +1,4 @@
-use std::io::Cursor;
+use std::{io::Cursor, iter::Filter};
 
 use anyhow::Ok;
 use image::{ DynamicImage, ImageFormat, ImageReader};
@@ -79,19 +79,6 @@ pub async fn edit_hue_rotation (para : &str, path : &str) -> Result<Vec<u8>, any
     Ok(img_buf.into_inner())
 }
 
-
-// pub async fn edit_resize (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
-//     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
-
-//     let mut resized_image = img.resize(para.parse::<i32>().unwrap());
-
-//     let mut img_buf = Cursor::new(Vec::new());
-//     resized_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
-
-//     Ok(img_buf.into_inner())
-// }
-
-
 pub async fn edit_flip (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
@@ -108,6 +95,21 @@ pub async fn edit_flip (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Err
 
     let mut img_buf = Cursor::new(Vec::new());
     flipped_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
+
+    Ok(img_buf.into_inner())
+}
+
+pub async fn edit_resize (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+    let img: DynamicImage  = ImageReader::open(path)?.decode()?;
+
+    let parts: Vec<&str> = para.split(|c| c=='/').collect();
+    let height = parts[0];
+    let weight = parts[1];
+
+    let mut resized_image = img.resize(height.parse::<u32>().unwrap(), weight.parse::<u32>().unwrap(), image::imageops::FilterType::Nearest);
+
+    let mut img_buf = Cursor::new(Vec::new());
+    resized_image.write_to(&mut img_buf, ImageFormat::Jpeg)?;
 
     Ok(img_buf.into_inner())
 }
