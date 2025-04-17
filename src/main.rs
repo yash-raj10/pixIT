@@ -3,7 +3,7 @@ mod Image_fns;
 use std::{env, io::{stdin, stdout, Write}, path::Path, process::Command};
 use clap::{command, Arg, Command as Command2};
 use image::{DynamicImage, ImageReader};
-use Image_fns::{edit_rotate, edit_blur, edit_grayscale};
+use Image_fns::{edit_rotate, edit_blur, edit_grayscale, edit_brighten, edit_contrast, edit_hue_rotation, edit_flip, edit_resize};
 
 fn main() {
 
@@ -35,6 +35,56 @@ fn main() {
             .long("para")
             .required(true)
             .help("No parameter needed. Hence write 0!")
+        )
+    )
+    .subcommand(
+        Command2::new("brighten")
+        .arg(
+            Arg::new("parameter")
+
+            .long("para")
+            .required(true)
+            .help("ex parameters -10, -5, 5, 10 etc.")
+        )
+    )
+    .subcommand(
+        Command2::new("contrast")
+        .arg(
+            Arg::new("parameter")
+
+            .long("para")
+            .required(true)
+            .help("ex parameters -10.0, -5.0, 5.0, 10.0 (float values) etc.")
+        )
+    )
+    .subcommand(
+        Command2::new("hue_rotation")
+        .arg(
+            Arg::new("parameter")
+
+            .long("para")
+            .required(true)
+            .help("ex parameters -10, -5, 5, 10 etc.")
+        )
+    )    
+    .subcommand(
+        Command2::new("flip")
+        .arg(
+            Arg::new("parameter")
+
+            .long("para")
+            .required(true)
+            .help("allowed parameters -> hor (horizontal), ver (vertical)")
+        )
+    )
+    .subcommand(
+        Command2::new("resize")
+        .arg(
+            Arg::new("parameter")
+
+            .long("para")
+            .required(true)
+            .help("ex(h/w) -> 300/300, 560/624, etc.")
         )
     )
     // .arg(
@@ -167,6 +217,89 @@ async fn edit(editOP : String, para : &str, path : &str, ){
                 }
             }
         }
+
+        "resize" => {
+            // print!("2editOP is {} and para is {} with path {}", editOP, para, path)
+            match edit_resize(para, path).await {
+                Ok(img_data) => {
+                    let output_path = format!("{}_resized.jpg", path.trim_end_matches(".jpeg").trim_end_matches(".jpg"));
+                    
+                    // Save the image to disk
+                    std::fs::write(&output_path, img_data).expect("Failed to write image file");
+                    println!("Resized image saved to: {}", output_path);
+                },
+                Err(e) => {
+                    eprintln!("Error processing image: {}", e);
+                }
+            }
+        }
+
+        "brighten" => {
+            // print!("2editOP is {} and para is {} with path {}", editOP, para, path)
+            match edit_brighten(para, path).await {
+                Ok(img_data) => {
+                    let output_path = format!("{}_brighten.jpg", path.trim_end_matches(".jpeg").trim_end_matches(".jpg"));
+                    
+                    // Save the image to disk
+                    std::fs::write(&output_path, img_data).expect("Failed to write image file");
+                    println!("Brighten image saved to: {}", output_path);
+                },
+                Err(e) => {
+                    eprintln!("Error processing image: {}", e);
+                }
+            }
+        }
+
+        "contrast" => {
+            // print!("2editOP is {} and para is {} with path {}", editOP, para, path)
+            match edit_contrast(para, path).await {
+                Ok(img_data) => {
+                    let output_path = format!("{}_contrast.jpg", path.trim_end_matches(".jpeg").trim_end_matches(".jpg"));
+                    
+                    // Save the image to disk
+                    std::fs::write(&output_path, img_data).expect("Failed to write image file");
+                    println!("Contrasted image saved to: {}", output_path);
+                },
+                Err(e) => {
+                    eprintln!("Error processing image: {}", e);
+                }
+            }
+        }
+
+        "hueRotation" => {
+            // print!("2editOP is {} and para is {} with path {}", editOP, para, path)
+            match edit_hue_rotation(para, path).await {
+                Ok(img_data) => {
+                    let output_path = format!("{}_hue.jpg", path.trim_end_matches(".jpeg").trim_end_matches(".jpg"));
+                    
+                    // Save the image to disk
+                    std::fs::write(&output_path, img_data).expect("Failed to write image file");
+                    println!("Hue Rotated image saved to: {}", output_path);
+                },
+                Err(e) => {
+                    eprintln!("Error processing image: {}", e);
+                }
+            }
+        }
+
+        "flip" => {
+            // print!("2editOP is {} and para is {} with path {}", editOP, para, path)
+            match edit_flip(para, path).await {
+                Ok(img_data) => {
+                    let output_path = format!("{}_flipped.jpg", path.trim_end_matches(".jpeg").trim_end_matches(".jpg"));
+                    
+                    // Save the image to disk
+                    std::fs::write(&output_path, img_data).expect("Failed to write image file");
+                    println!("Flipped Rotated image saved to: {}", output_path);
+                },
+                Err(e) => {
+                    eprintln!("Error processing image: {}", e);
+                }
+            }
+        }
+
+
+
         _ => {
             println!("Unknown operation: {}", editOP);
         }

@@ -1,4 +1,4 @@
-use std::{io::Cursor, iter::Filter};
+use std::io::Cursor;
 
 use anyhow::Ok;
 use image::{ DynamicImage, ImageFormat, ImageReader};
@@ -24,7 +24,7 @@ pub async fn edit_rotate(para : &str, path : &str,) -> Result<Vec<u8>, anyhow::E
     Ok(img_buf.into_inner())
 } 
 
-pub async fn edit_blur(para : &str, path : &str,)-> Result<Vec<u8>, anyhow::Error>{
+pub async fn edit_blur(para : &str, path : &str,) -> Result<Vec<u8>, anyhow::Error>{
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let mut blured_image = img.blur(para.parse::<f32>().unwrap());
@@ -35,7 +35,7 @@ pub async fn edit_blur(para : &str, path : &str,)-> Result<Vec<u8>, anyhow::Erro
     Ok(img_buf.into_inner())
 }
 
-pub async fn edit_grayscale (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+pub async fn edit_grayscale(para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let mut grayscale_image = img.grayscale();
@@ -46,7 +46,7 @@ pub async fn edit_grayscale (para : &str, path : &str) -> Result<Vec<u8>, anyhow
     Ok(img_buf.into_inner())
 }
 
-pub async fn edit_brighten (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+pub async fn edit_brighten(para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let mut brighten_image = img.brighten(para.parse::<i32>().unwrap());
@@ -57,7 +57,7 @@ pub async fn edit_brighten (para : &str, path : &str) -> Result<Vec<u8>, anyhow:
     Ok(img_buf.into_inner())
 }
 
-pub async fn edit_contrast (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+pub async fn edit_contrast(para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let mut contrasted_image = img.adjust_contrast(para.parse::<f32>().unwrap());
@@ -68,7 +68,7 @@ pub async fn edit_contrast (para : &str, path : &str) -> Result<Vec<u8>, anyhow:
     Ok(img_buf.into_inner())
 }
 
-pub async fn edit_hue_rotation (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+pub async fn edit_hue_rotation(para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let mut hue_image = img.huerotate(para.parse::<i32>().unwrap());
@@ -79,7 +79,7 @@ pub async fn edit_hue_rotation (para : &str, path : &str) -> Result<Vec<u8>, any
     Ok(img_buf.into_inner())
 }
 
-pub async fn edit_flip (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+pub async fn edit_flip(para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let mut flipped_image: DynamicImage;
@@ -99,7 +99,7 @@ pub async fn edit_flip (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Err
     Ok(img_buf.into_inner())
 }
 
-pub async fn edit_resize (para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
+pub async fn edit_resize(para : &str, path : &str) -> Result<Vec<u8>, anyhow::Error> {
     let img: DynamicImage  = ImageReader::open(path)?.decode()?;
 
     let parts: Vec<&str> = para.split(|c| c=='/').collect();
